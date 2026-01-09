@@ -15,11 +15,15 @@ function getApiUrl(): string {
 
 const API_URL = getApiUrl()
 
-// Only log in development
-if (import.meta.env.DEV) {
+// Always log in native apps for debugging
+if (Capacitor.isNativePlatform() || import.meta.env.DEV) {
+  console.log('=== API Configuration ===')
   console.log('API URL:', API_URL)
   console.log('Platform:', Capacitor.getPlatform())
   console.log('Is Native:', Capacitor.isNativePlatform())
+  console.log('Environment:', import.meta.env.MODE)
+  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL)
+  console.log('========================')
 }
 
 const api = axios.create({
@@ -32,7 +36,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  if (import.meta.env.DEV) {
+  if (Capacitor.isNativePlatform() || import.meta.env.DEV) {
     console.log('Making request to:', config.baseURL + config.url)
   }
   const token = localStorage.getItem('token')
@@ -45,9 +49,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (import.meta.env.DEV) {
+    if (Capacitor.isNativePlatform() || import.meta.env.DEV) {
       console.error('API Error:', error.message)
       console.error('Error config:', error.config)
+      console.error('Error response:', error.response)
     }
     if (error.response?.status === 401) {
       localStorage.removeItem('token')

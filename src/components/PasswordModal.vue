@@ -47,7 +47,7 @@ async function handleSubmit() {
   <div class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white dark:bg-dark-900 rounded-xl max-w-md w-full p-6 border border-gray-200 dark:border-dark-800 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Promeni lozinku</h3>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Promijeni lozinku</h3>
         <button @click="emit('close')" class="text-gray-400 hover:text-gold-500 transition-colors">
           <X class="w-6 h-6" />
         </button>
@@ -70,7 +70,7 @@ async function handleSubmit() {
         <p v-if="message" :class="['text-sm', isSuccess ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400']">{{ message }}</p>
 
         <button type="submit" :disabled="loading" class="w-full btn-gold text-white font-medium py-3 rounded-xl disabled:opacity-50">
-          {{ loading ? 'Promena...' : 'Promeni lozinku' }}
+          {{ loading ? 'Promena...' : 'Promijeni lozinku' }}
         </button>
       </form>
     </div>

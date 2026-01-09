@@ -75,7 +75,7 @@ async function handleLogout() {
               <Sun v-else class="w-5 h-5 text-gold-400" />
             </button>
             <span class="text-sm text-gray-700 dark:text-gray-300 hidden sm:block">{{ authStore.user?.name }}</span>
-            <button @click="showPasswordModal = true" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800 border border-gray-200 dark:border-dark-700 transition-all hidden sm:block" title="Promeni lozinku">
+            <button @click="showPasswordModal = true" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800 border border-gray-200 dark:border-dark-700 transition-all hidden sm:block" title="Promijeni lozinku">
               <Settings class="w-5 h-5 text-gray-600 dark:text-gold-400" />
             </button>
             <button @click="handleLogout" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800 border border-gray-200 dark:border-dark-700 transition-all hidden sm:block">
@@ -131,7 +131,7 @@ async function handleLogout() {
           <div class="border-t border-gray-100 dark:border-dark-800 pt-2 mt-2">
             <button @click="showPasswordModal = true; mobileMenuOpen = false" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-gray-50 dark:hover:bg-dark-800 transition-all">
               <Settings class="w-5 h-5" />
-              <span>Promeni lozinku</span>
+              <span>Promijeni lozinku</span>
             </button>
             <button @click="handleLogout" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-gray-50 dark:hover:bg-dark-800 transition-all">
               <LogOut class="w-5 h-5" />
