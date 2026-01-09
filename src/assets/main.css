@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Light mode body */
+body {
+  background: #ffffff;
+}
+
+/* Dark mode body */
+.dark body,
+body.dark {
+  background: #0a0a0a;
+}
+
+html.dark {
+  background: #0a0a0a;
+}
+
+/* Native status bar padding for Capacitor apps */
+.native-status-bar-padding {
+  padding-top: 0;
+}
+
+/* iOS safe area support */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .native-status-bar-padding {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  /* iOS bottom safe area for home indicator */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
+
+/* Fallback for Android where safe-area might not work */
+@media screen and (display-mode: standalone) {
+  .native-status-bar-padding {
+    padding-top: 24px; /* Standard Android status bar height */
+  }
+}
+
+/* Capacitor native app detection - iOS needs more padding for notch */
+html.plt-capacitor .native-status-bar-padding,
+html.plt-android .native-status-bar-padding {
+  padding-top: 28px;
+}
+
+html.plt-ios .native-status-bar-padding {
+  padding-top: max(env(safe-area-inset-top, 44px), 44px);
+}
+
+/* Gold gradient text - rose gold / peach */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #e9c4ad 0%, #dea988 50%, #c9906d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold border glow */
+.border-gold-glow {
+  box-shadow: 0 0 20px rgba(222, 169, 136, 0.15);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(222, 169, 136, 0.1);
+}
+
+/* Button gold gradient */
+.btn-gold {
+  background: linear-gradient(135deg, #e9c4ad 0%, #dea988 50%, #c9906d 100%);
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background: linear-gradient(135deg, #f0d4c0 0%, #e9c4ad 50%, #dea988 100%);
+  box-shadow: 0 4px 20px rgba(222, 169, 136, 0.4);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #e5e5e5;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #171717;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #dea988, #c9906d);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e9c4ad, #dea988);
+}
+
+/* Input focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}
+
+/* Radio button gold styling */
+input[type="radio"] {
+  accent-color: #dea988;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(222, 169, 136, 0.3);
+  color: #c9906d;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Glass effect for cards */
+.glass {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Confirm modal animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+.fade-in {
+  animation-name: fadeIn;
+}
+.zoom-in {
+  animation-name: zoomIn;
+}
+
+/* Hide audio download button */
+audio::-webkit-media-controls-download-button,
+audio::-webkit-media-controls-overflow-menu-button {
+  display: none !important;
+}
+audio::-webkit-media-controls-enclosure {
+  overflow: hidden;
+}
+audio::-webkit-media-controls-panel {
+  width: calc(100% + 30px);
+}
+
+/* Post content styling */
+.post-content a {
+  color: #dea988;
+  text-decoration: none;
+}
+.post-content a:hover {
+  text-decoration: underline;
+}
+.post-content b, .post-content strong {
+  font-weight: 600;
+}
+.post-content i, .post-content em {
+  font-style: italic;
+}
