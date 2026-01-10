@@ -4,6 +4,8 @@ import api from '@/lib/api'
 import { getImageUrl } from '@/lib/imageUrl'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { Plus, MessageCircle, Pin, PinOff, Trash2, Send, Edit2, Reply } from 'lucide-vue-next'
 import PostModal from '@/components/PostModal.vue'
 import ImageLightbox from '@/components/ImageLightbox.vue'
@@ -50,6 +52,24 @@ const editingCommentId = ref<number | null>(null)
 const editCommentContent = ref('')
 
 onMounted(() => loadPosts())
+
+// Refresh data when app returns from background
+useAppResume(() => {
+  loadPosts()
+  // Refresh comments for expanded post if any
+  if (expandedPost.value) {
+    loadComments(expandedPost.value)
+  }
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadPosts()
+  // Refresh comments for expanded post if any
+  if (expandedPost.value) {
+    loadComments(expandedPost.value)
+  }
+}, '/')
 
 async function loadPosts() {
   loading.value = true

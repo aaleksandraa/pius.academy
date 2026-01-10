@@ -4,6 +4,8 @@ import api from '@/lib/api'
 import { getImageUrl } from '@/lib/imageUrl'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { Plus, HelpCircle, MessageCircle, Trash2, Send, X, Edit2, Reply } from 'lucide-vue-next'
 import ImageLightbox from '@/components/ImageLightbox.vue'
 import MentionInput from '@/components/MentionInput.vue'
@@ -48,6 +50,24 @@ const editingAnswerId = ref<number | null>(null)
 const editAnswerText = ref('')
 
 onMounted(() => loadQuestions())
+
+// Refresh data when app returns from background
+useAppResume(() => {
+  loadQuestions()
+  // Refresh answers for expanded question if any
+  if (expandedQuestion.value) {
+    loadAnswers(expandedQuestion.value)
+  }
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadQuestions()
+  // Refresh answers for expanded question if any
+  if (expandedQuestion.value) {
+    loadAnswers(expandedQuestion.value)
+  }
+}, '/questions')
 
 async function loadQuestions() {
   loading.value = true

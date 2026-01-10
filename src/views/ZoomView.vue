@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/lib/api'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { Video, Calendar, X } from 'lucide-vue-next'
 
 interface Recording {
@@ -17,6 +19,16 @@ const selectedRecording = ref<Recording | null>(null)
 const loading = ref(false)
 
 onMounted(() => loadRecordings())
+
+// Refresh when app returns from background
+useAppResume(() => {
+  loadRecordings()
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadRecordings()
+}, '/zoom')
 
 async function loadRecordings() {
   loading.value = true

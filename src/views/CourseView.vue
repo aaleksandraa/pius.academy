@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/lib/api'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { Play, ArrowLeft } from 'lucide-vue-next'
 
 interface Lesson {
@@ -26,6 +28,16 @@ const selectedLesson = ref<Lesson | null>(null)
 const loading = ref(false)
 
 onMounted(() => loadCourses())
+
+// Refresh when app returns from background
+useAppResume(() => {
+  loadCourses()
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadCourses()
+}, '/course')
 
 async function loadCourses() {
   loading.value = true

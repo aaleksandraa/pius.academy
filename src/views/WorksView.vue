@@ -4,6 +4,8 @@ import api from '@/lib/api'
 import { getImageUrl } from '@/lib/imageUrl'
 import { useAuthStore } from '@/stores/auth'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { Plus, MessageSquare, FileText, Trash2, Send, X, Image as ImageIcon, Edit2, Reply } from 'lucide-vue-next'
 import ImageLightbox from '@/components/ImageLightbox.vue'
 import MentionInput from '@/components/MentionInput.vue'
@@ -53,6 +55,24 @@ const editingFeedbackId = ref<number | null>(null)
 const editFeedbackText = ref('')
 
 onMounted(() => loadWorks())
+
+// Refresh data when app returns from background
+useAppResume(() => {
+  loadWorks()
+  // Refresh feedback for expanded work if any
+  if (expandedWork.value) {
+    loadFeedback(expandedWork.value)
+  }
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadWorks()
+  // Refresh feedback for expanded work if any
+  if (expandedWork.value) {
+    loadFeedback(expandedWork.value)
+  }
+}, '/works')
 
 async function loadWorks() {
   loading.value = true

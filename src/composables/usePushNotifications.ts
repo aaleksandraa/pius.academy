@@ -70,6 +70,16 @@ export function usePushNotifications() {
         const data = notification.notification.data
         if (data?.link) {
           router.push(data.link)
+          
+          // Emit custom event to trigger refresh on the target page
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('refresh-from-notification', {
+              detail: { 
+                link: data.link, 
+                type: data.type || notification.notification.title 
+              }
+            }))
+          }, 100) // Small delay to ensure navigation completes
         }
       })
 

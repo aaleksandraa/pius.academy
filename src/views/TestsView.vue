@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/lib/api'
+import { useAppResume } from '@/composables/useAppResume'
+import { useNotificationRefresh } from '@/composables/useNotificationRefresh'
 import { FileText, CheckCircle, XCircle, Award, ArrowLeft } from 'lucide-vue-next'
 
 interface TestQuestion {
@@ -40,6 +42,18 @@ const loading = ref(false)
 const submitting = ref(false)
 
 onMounted(() => { loadTests(); loadResults() })
+
+// Refresh data when app returns from background
+useAppResume(() => {
+  loadTests()
+  loadResults()
+})
+
+// Refresh when user taps on push notification
+useNotificationRefresh(() => {
+  loadTests()
+  loadResults()
+}, '/tests')
 
 async function loadTests() {
   loading.value = true
