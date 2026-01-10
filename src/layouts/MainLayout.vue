@@ -4,7 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import api from '@/lib/api'
-import { Home, BookOpen, Video, FileText, HelpCircle, Image, Mail, Users, LogOut, Sun, Moon, Settings, Menu, X, Package } from 'lucide-vue-next'
+import { Home, BookOpen, Video, FileText, HelpCircle, Image, Mail, Users, LogOut, Sun, Moon, Settings, Menu, X, Package, ClipboardList } from 'lucide-vue-next'
 import PasswordModal from '@/components/PasswordModal.vue'
 import NotificationDropdown from '@/components/NotificationDropdown.vue'
 
@@ -31,6 +31,7 @@ const navigation = [
   { name: 'Kurs', icon: BookOpen, route: 'course', roles: ['admin', 'educator', 'student'] },
   { name: 'Zoom Snimci', icon: Video, route: 'zoom', roles: ['admin', 'educator', 'student'] },
   { name: 'Testovi', icon: FileText, route: 'tests', roles: ['admin', 'educator', 'student'] },
+  { name: 'Rezultati testova', icon: ClipboardList, route: 'test-results', roles: ['admin', 'educator'] },
   { name: 'Pitanja', icon: HelpCircle, route: 'questions', roles: ['admin', 'educator', 'student'] },
   { name: 'Radovi', icon: Image, route: 'works', roles: ['admin', 'educator', 'student'] },
   { name: 'Materijali', icon: Package, route: 'materials', roles: ['admin', 'educator', 'student'], dynamic: true },

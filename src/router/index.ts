@@ -19,6 +19,7 @@ const router = createRouter({
         { path: 'course', name: 'course', component: () => import('@/views/CourseView.vue') },
         { path: 'zoom', name: 'zoom', component: () => import('@/views/ZoomView.vue') },
         { path: 'tests', name: 'tests', component: () => import('@/views/TestsView.vue') },
+        { path: 'test-results', name: 'test-results', component: () => import('@/views/TestResultsView.vue'), meta: { educator: true } },
         { path: 'questions', name: 'questions', component: () => import('@/views/QuestionsView.vue') },
         { path: 'works', name: 'works', component: () => import('@/views/WorksView.vue') },
         { path: 'materials', name: 'materials', component: () => import('@/views/MaterialsView.vue') },
@@ -41,6 +42,8 @@ router.beforeEach(async (to, _from, next) => {
   } else if (to.meta.guest && authStore.isAuthenticated) {
     next('/')
   } else if (to.meta.admin && !authStore.isAdmin) {
+    next('/')
+  } else if (to.meta.educator && !authStore.isAdmin && authStore.user?.role !== 'educator') {
     next('/')
   } else {
     next()
