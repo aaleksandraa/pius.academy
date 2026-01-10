@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/lib/api'
+import { useAuthStore } from '@/stores/auth'
 import { FileText, CheckCircle, XCircle, Award, ArrowLeft } from 'lucide-vue-next'
+
+const authStore = useAuthStore()
+const isEducatorOrAdmin = computed(() => authStore.user?.role === 'admin' || authStore.user?.role === 'educator')
 
 interface TestQuestion {
   id: number
@@ -23,6 +27,7 @@ interface TestResult {
   id: number
   test_id: number
   test: { id: number; title: string }
+  user?: { id: number; name: string; email: string }
   answers: Array<{ question_id: number; question_text: string; selected_answer: string; correct_answer: string; is_correct: boolean }>
   score: number
   total_questions: number
@@ -52,7 +57,9 @@ async function loadTests() {
 }
 
 async function loadResults() {
-  const { data } = await api.get('/test-results')
+  // Educators and admins see all results, students see only their own
+  const endpoint = isEducatorOrAdmin.value ? '/educator/test-results' : '/test-results'
+  const { data } = await api.get(endpoint)
   results.value = data.results
 }
 
@@ -99,7 +106,12 @@ function resetTest() {
       </button>
       <div class="bg-white dark:bg-dark-900 rounded-xl p-6 border border-gray-200 dark:border-dark-800 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pregled rezultata</h1>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pregled rezultata</h1>
+            <p v-if="viewingResult.user && isEducatorOrAdmin" class="text-gray-600 dark:text-gray-400 mt-1">
+              Student: {{ viewingResult.user.name }}
+            </p>
+          </div>
           <div class="flex items-center space-x-2">
             <Award class="w-6 h-6 text-gold-500" />
             <span class="text-2xl font-bold text-gradient-gold">{{ viewingResult.score }}/{{ viewingResult.total_questions }}</span>
@@ -201,6 +213,57 @@ function resetTest() {
     <!-- Test List -->
     <div v-else>
       <h1 class="text-3xl font-bold text-gradient-gold mb-6">Testovi</h1>
+      
+      <!-- All Results for Educators/Admins -->
+      <div v-if="isEducatorOrAdmin && results.length > 0" class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Svi rezultati studenata</h2>
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 dark:bg-dark-800 border-b border-gray-200 dark:border-dark-700">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Test</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rezultat</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Procenat</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Datum</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Akcije</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 dark:divide-dark-700">
+                <tr v-for="result in results" :key="result.id" class="hover:bg-gray-50 dark:hover:bg-dark-800 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ result.user?.name || 'N/A' }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ result.user?.email || '' }}</div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900 dark:text-white">{{ result.test.title }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ result.score }}/{{ result.total_questions }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', result.percentage >= 70 ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400']">
+                      {{ result.percentage }}%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ new Date(result.completed_at).toLocaleDateString('sr-RS') }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <button @click="viewingResult = result" class="text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium">
+                      Pregled
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Tests -->
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{{ isEducatorOrAdmin ? 'Dostupni testovi' : 'Testovi' }}</h2>
       <div class="grid gap-4">
         <div v-for="test in tests" :key="test.id" class="bg-white dark:bg-dark-900 rounded-xl p-6 border border-gray-200 dark:border-dark-800 flex items-center justify-between card-hover">
           <div class="flex-1">
