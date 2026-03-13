@@ -56,10 +56,22 @@ export function usePushNotifications() {
         console.error('Push registration error:', error)
       })
 
-      // Listen for push notifications received
+      // Listen for push notifications received (when app is in foreground)
       PushNotifications.addListener('pushNotificationReceived', (notification) => {
-        console.log('Push notification received:', notification)
-        // You can show a local notification or update UI here
+        console.log('Push notification received (in-app):', notification)
+        
+        // Emit event to show in-app notification toast
+        // The useInAppNotifications composable will handle displaying it
+        window.dispatchEvent(new CustomEvent('in-app-notification-received', {
+          detail: {
+            id: Date.now(), // Temporary ID for toast
+            type: notification.data?.type || 'notification',
+            title: notification.title,
+            message: notification.body,
+            link: notification.data?.link || null,
+            created_at: new Date().toISOString()
+          }
+        }))
       })
 
       // Listen for push notification action (when user taps notification)

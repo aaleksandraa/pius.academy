@@ -94,6 +94,16 @@ function handleNotificationClick(notification: Notification) {
   if (notification.link) {
     router.push(notification.link)
     closeDropdown()
+    
+    // Emit event to trigger refresh on the target page
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('refresh-from-notification', {
+        detail: { 
+          link: notification.link, 
+          type: notification.type 
+        }
+      }))
+    }, 100) // Small delay to ensure navigation completes
   }
 }
 

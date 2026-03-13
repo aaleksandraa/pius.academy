@@ -39,6 +39,9 @@ const answerText = ref<Record<number, string>>({})
 const showModal = ref(false)
 const newQuestion = ref({ question_text: '' })
 const loading = ref(false)
+const loadingMore = ref(false)
+const currentPage = ref(1)
+const hasMore = ref(false)
 const lightboxImage = ref<string | null>(null)
 const answerInputRefs = ref<Record<number, any>>({})
 const sendingAudio = ref<Record<number, boolean>>({})
@@ -69,14 +72,36 @@ useNotificationRefresh(() => {
   }
 }, '/questions')
 
-async function loadQuestions() {
-  loading.value = true
-  try {
-    const { data } = await api.get('/questions')
-    questions.value = data.questions
-  } finally {
-    loading.value = false
+async function loadQuestions(page = 1) {
+  const isLoadMore = page > 1
+  if (isLoadMore) {
+    if (loadingMore.value || !hasMore.value) return
+    loadingMore.value = true
+  } else {
+    loading.value = true
   }
+
+  try {
+    const { data } = await api.get('/questions', {
+      params: { page }
+    })
+    const loadedQuestions = data.questions ?? []
+
+    questions.value = isLoadMore ? [...questions.value, ...loadedQuestions] : loadedQuestions
+    currentPage.value = data.meta?.current_page ?? page
+    const lastPage = data.meta?.last_page ?? currentPage.value
+    hasMore.value = currentPage.value < lastPage
+  } finally {
+    if (isLoadMore) {
+      loadingMore.value = false
+    } else {
+      loading.value = false
+    }
+  }
+}
+
+async function loadMoreQuestions() {
+  await loadQuestions(currentPage.value + 1)
 }
 
 async function loadAnswers(questionId: number) {
@@ -100,7 +125,7 @@ async function createQuestion() {
     await api.post('/questions', newQuestion.value)
     showModal.value = false
     newQuestion.value = { question_text: '' }
-    loadQuestions()
+    await loadQuestions()
   } finally {
     loading.value = false
   }
@@ -299,6 +324,16 @@ function formatAnswerContent(content: string) {
 
       <div v-if="!questions.length && !loading" class="text-center py-12">
         <p class="text-gray-400 dark:text-gray-500">Nema pitanja</p>
+      </div>
+
+      <div v-if="hasMore && questions.length > 0" class="flex justify-center pt-2">
+        <button
+          @click="loadMoreQuestions"
+          :disabled="loadingMore"
+          class="px-5 py-2.5 rounded-xl border border-gold-300 dark:border-gold-700 text-gold-600 dark:text-gold-400 hover:bg-gold-50 dark:hover:bg-gold-900/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ loadingMore ? 'Učitavanje...' : 'Učitaj starija pitanja' }}
+        </button>
       </div>
     </div>
 

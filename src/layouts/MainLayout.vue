@@ -7,6 +7,8 @@ import api from '@/lib/api'
 import { Home, BookOpen, Video, FileText, HelpCircle, Image, Mail, Users, LogOut, Sun, Moon, Settings, Menu, X, Package, ClipboardList } from 'lucide-vue-next'
 import PasswordModal from '@/components/PasswordModal.vue'
 import NotificationDropdown from '@/components/NotificationDropdown.vue'
+import InAppNotificationToast from '@/components/InAppNotificationToast.vue'
+import { useInAppNotifications } from '@/composables/useInAppNotifications'
 
 const router = useRouter()
 const route = useRoute()
@@ -16,6 +18,9 @@ const themeStore = useThemeStore()
 const mobileMenuOpen = ref(false)
 const showPasswordModal = ref(false)
 const materialsEnabled = ref(true)
+
+// In-app notifications
+const { toastNotifications, hideToast, handleToastClick } = useInAppNotifications()
 
 onMounted(async () => {
   try {
@@ -146,6 +151,13 @@ async function handleLogout() {
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <router-view />
     </main>
+
+    <!-- In-App Notification Toasts -->
+    <InAppNotificationToast 
+      :notifications="toastNotifications" 
+      @click="handleToastClick"
+      @close="hideToast"
+    />
 
     <PasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
   </div>

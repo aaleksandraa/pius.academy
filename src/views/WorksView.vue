@@ -43,6 +43,9 @@ const newWork = ref({ title: '', description: '' })
 const selectedImage = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 const loading = ref(false)
+const loadingMore = ref(false)
+const currentPage = ref(1)
+const hasMore = ref(false)
 const lightboxImage = ref<string | null>(null)
 const feedbackInputRefs = ref<Record<number, any>>({})
 const sendingAudio = ref<Record<number, boolean>>({})
@@ -74,14 +77,36 @@ useNotificationRefresh(() => {
   }
 }, '/works')
 
-async function loadWorks() {
-  loading.value = true
-  try {
-    const { data } = await api.get('/works')
-    works.value = data.works
-  } finally {
-    loading.value = false
+async function loadWorks(page = 1) {
+  const isLoadMore = page > 1
+  if (isLoadMore) {
+    if (loadingMore.value || !hasMore.value) return
+    loadingMore.value = true
+  } else {
+    loading.value = true
   }
+
+  try {
+    const { data } = await api.get('/works', {
+      params: { page }
+    })
+    const loadedWorks = data.works ?? []
+
+    works.value = isLoadMore ? [...works.value, ...loadedWorks] : loadedWorks
+    currentPage.value = data.meta?.current_page ?? page
+    const lastPage = data.meta?.last_page ?? currentPage.value
+    hasMore.value = currentPage.value < lastPage
+  } finally {
+    if (isLoadMore) {
+      loadingMore.value = false
+    } else {
+      loading.value = false
+    }
+  }
+}
+
+async function loadMoreWorks() {
+  await loadWorks(currentPage.value + 1)
 }
 
 async function loadFeedback(workId: number) {
@@ -121,7 +146,7 @@ async function createWork() {
     newWork.value = { title: '', description: '' }
     selectedImage.value = null
     imagePreview.value = null
-    loadWorks()
+    await loadWorks()
   } finally {
     loading.value = false
   }
@@ -336,6 +361,16 @@ function formatFeedbackContent(content: string) {
 
       <div v-if="!works.length && !loading" class="text-center py-12">
         <p class="text-gray-400 dark:text-gray-500">Nema predatih radova</p>
+      </div>
+
+      <div v-if="hasMore && works.length > 0" class="flex justify-center pt-2">
+        <button
+          @click="loadMoreWorks"
+          :disabled="loadingMore"
+          class="px-5 py-2.5 rounded-xl border border-gold-300 dark:border-gold-700 text-gold-600 dark:text-gold-400 hover:bg-gold-50 dark:hover:bg-gold-900/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ loadingMore ? 'Učitavanje...' : 'Učitaj starije radove' }}
+        </button>
       </div>
     </div>
 
